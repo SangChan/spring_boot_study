@@ -1,0 +1,398 @@
+---
+tags: [android, gradle]
+projects: [spring-android]
+---
+:Installing_Gradle: http://www.gradle.org/docs/current/userguide/installation.html
+:Gradle_Downloads: http://www.gradle.org/downloads
+:sdk: http://developer.android.com/sdk/index.html
+:jdk: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+:gs-android: link:/guides/gs/android
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-gradle-android
+This guide walks you through the process of using Gradle to build a simple Android project.
+
+== What you'll build
+
+You'll create a simple Spring app for Android and then build it with Gradle.
+
+
+== What you'll need
+
+ - About 15 minutes
+ - A favorite text editor or IDE
+ - {jdk}[JDK 6] or later
+ - {sdk}[Android SDK]
+ - An Android device or Emulator
+
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+
+[[scratch]]
+== Set up the project
+
+First, you need to set up an Android project for Gradle to build. To keep the focus on Gradle, make the project as simple as possible for now. If this is your first time working with Android projects, refer to {gs-android}[Getting Started with Android] to help configure your development environment.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_directory_structure_org_hello.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_android_manifest.adoc[]
+
+`src/main/AndroidManifest.xml`
+[source,xml]
+----
+include::initial/src/main/AndroidManifest.xml[]
+----
+
+Add a text string. Text strings can be referenced from the application or from other resource files.
+
+`src/main/res/values/strings.xml`
+[source,xml]
+----
+include::initial/src/main/res/values/strings.xml[]
+----
+
+Here you define the visual structure for the user interface of your application.
+
+`src/main/res/layout/hello_layout.xml`
+[source,xml]
+----
+include::initial/src/main/res/layout/hello_layout.xml[]
+----
+
+
+Within the `src/main/java/org/hello` directory, you can create any Java classes you want. To maintain consistency with the rest of this guide, create the following class:
+
+`src/main/java/org/hello/HelloActivity.java`
+[source,java]
+----
+include::initial/src/main/java/org/hello/HelloActivity.java[]
+----
+
+
+[[initial]]
+== Install Gradle
+
+Now that you have a project that you can build with Gradle, you can install Gradle. 
+
+**1.** Download Gradle 1.11 from the {Gradle_Downloads}[Gradle Downloads] page.
+
+NOTE: Only the binaries are required, so look for the link to `gradle-1.11-bin.zip`. Alternatively, you can choose `gradle-1.11-all.zip` to download the sources and documentation as well as the binaries.
+
+**2.** Unzip the archive and place it in a location of your choosing. For example, on Linux or Mac, you may want to place it in the root of your user directory. See the {Installing_Gradle}[Installing Gradle] page for additional details.
+
+**3.** Configure the `GRADLE_HOME` environment variable based on the location where you installed Gradle.
+
+Mac/Linux::
+----
+export GRADLE_HOME=/<installation location>/gradle-1.11
+export PATH=${PATH}:$GRADLE_HOME/bin
+----
+
+Windows::
+----
+set GRADLE_HOME=C:\<installation location>\gradle-1.11
+set PATH=%PATH%;%GRADLE_HOME%\bin
+----
+
+**4.** Test the Gradle installation with following command:
+
+----
+$ gradle
+----
+
+If the installation is correct, you see a welcome message:
+
+----
+:help
+
+Welcome to Gradle 1.11.
+
+To run a build, run gradle <task> ...
+
+To see a list of available tasks, run gradle tasks
+
+To see a list of command-line options, run gradle --help
+
+BUILD SUCCESSFUL
+
+Total time: 3.618 secs 
+----
+
+You now have Gradle installed.
+
+
+== Find out what Gradle can do
+
+Before you even create a build.gradle file for the project, you can ask Gradle what tasks are available:
+
+----
+gradle tasks
+----
+
+You should see a list of available tasks. Assuming you run Gradle in a folder that does not contain a `build.gradle` file, you see basic tasks such as the following:
+
+....
+:tasks
+
+------------------------------------------------------------
+All tasks runnable from root project
+------------------------------------------------------------
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build. [incubating]
+wrapper - Generates Gradle wrapper files. [incubating]
+
+Help tasks
+----------
+dependencies - Displays all dependencies declared in root project 'temp'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'temp'.
+help - Displays a help message
+projects - Displays the sub-projects of root project 'temp'.
+properties - Displays the properties of root project 'temp'.
+tasks - Displays the tasks runnable from root project 'temp'.
+
+To see all tasks and more detail, run with --all.
+
+BUILD SUCCESSFUL
+
+Total time: 1.537 secs
+....
+
+Even though these tasks are available, they do not offer much value without a project build configuration. As you flesh out the `build.gradle` file, some of these tasks become more useful. The list of tasks will grow as you add plugins to the `build.gradle` file. You can run **gradle tasks** again to see what new tasks are available.
+
+
+== Build Android code
+
+The most simple Android project has the following `build.gradle` file:
+
+`build.gradle`
+[source,gradle]
+----
+include::initial/build.gradle[]
+----
+
+This build configuration brings a significant amount of power. Run **gradle tasks** again, and you see new tasks for building the project, creating JavaDoc, and running tests. The complete output can be seen below:
+
+....
+:tasks
+
+------------------------------------------------------------
+All tasks runnable from root project
+------------------------------------------------------------
+
+Android tasks
+-------------
+androidDependencies - Displays the Android dependencies of the project
+signingReport - Displays the signing info for each variant
+
+Build tasks
+-----------
+assemble - Assembles all variants of all applications and secondary packages.
+assembleDebug - Assembles all Debug builds
+assembleDebugTest - Assembles the Test build for the Debug build
+assembleRelease - Assembles all Release builds
+build - Assembles and tests this project.
+buildDependents - Assembles and tests this project and all projects that depend on it.
+buildNeeded - Assembles and tests this project and all projects it depends on.
+clean - Deletes the build directory.
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build. [incubating]
+
+Help tasks
+----------
+dependencies - Displays all dependencies declared in root project 'complete'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'complete'.
+help - Displays a help message
+projects - Displays the sub-projects of root project 'complete'.
+properties - Displays the properties of root project 'complete'.
+tasks - Displays the tasks runnable from root project 'complete'.
+
+Install tasks
+-------------
+installDebug - Installs the Debug build
+installDebugTest - Installs the Test build for the Debug build
+uninstallAll - Uninstall all applications.
+uninstallDebug - Uninstalls the Debug build
+uninstallDebugTest - Uninstalls the Test build for the Debug build
+uninstallRelease - Uninstalls the Release build
+
+Verification tasks
+------------------
+check - Runs all checks.
+connectedAndroidTest - Installs and runs the tests for Build 'debug' on connected devices.
+connectedCheck - Runs all device checks on currently connected devices.
+deviceCheck - Runs all device checks using Device Providers and Test Servers.
+lint - Runs lint on all variants.
+lintDebug - Runs lint on the Debug build
+lintRelease - Runs lint on the Release build
+
+Other tasks
+-----------
+wrapper
+
+Rules
+-----
+Pattern: build<ConfigurationName>: Assembles the artifacts of a configuration.
+Pattern: upload<ConfigurationName>: Assembles and uploads the artifacts belonging to a configuration.
+Pattern: clean<TaskName>: Cleans the output files of a task.
+
+To see all tasks and more detail, run with --all.
+
+BUILD SUCCESSFUL
+
+Total time: 4.11 secs
+....
+
+You will use the **gradle build** task frequently. This task compiles, tests, and packages the code into an APK file. You can run it like this:
+
+----
+gradle build
+----
+
+After a few seconds, you see "BUILD SUCCESSFUL". The complete output can be seen below:
+
+....
+:compileDebugNdk
+:preBuild
+:preDebugBuild
+:checkDebugManifest
+:prepareDebugDependencies
+:compileDebugAidl
+:compileDebugRenderscript
+:generateDebugBuildConfig
+:mergeDebugAssets
+:generateDebugResValues UP-TO-DATE
+:generateDebugResources
+:mergeDebugResources
+:processDebugManifest
+:processDebugResources
+:generateDebugSources
+:compileDebugJava
+:preDexDebug
+:dexDebug
+:processDebugJavaRes UP-TO-DATE
+:validateDebugSigning
+:packageDebug
+:assembleDebug
+:preReleaseBuild
+:checkReleaseManifest
+:prepareReleaseDependencies
+:compileReleaseAidl
+:compileReleaseRenderscript
+:generateReleaseBuildConfig
+:mergeReleaseAssets
+:generateReleaseResValues UP-TO-DATE
+:generateReleaseResources
+:mergeReleaseResources
+:processReleaseManifest
+:processReleaseResources
+:generateReleaseSources
+:compileReleaseJava
+:lintVitalRelease SKIPPED
+:compileReleaseNdk
+:preDexRelease
+:dexRelease
+:processReleaseJavaRes UP-TO-DATE
+:packageRelease
+:assembleRelease
+:assemble
+:compileLint
+:lint
+:check
+:build
+
+BUILD SUCCESSFUL
+
+Total time: 22.78 secs
+....
+
+You can see results of the build process in the `build` folder. Here you see several folders related to various parts of the build or application. The assembled Android package resides in the `apk` folder. The APK file here is ready to be deployed to a device or emulator.
+
+
+== Declare dependencies
+
+The simple Hello World sample is completely self-contained and does not depend on any additional libraries. Most applications, however, depend on external libraries to handle common and/or complex functionality.
+
+For example, suppose you want the application to print the current date and time. You could use the date and time facilities in the native Java libraries, but you can make things more interesting by using the Joda Time libraries.
+
+To do this, modify `HelloActivity.java` to look like this:
+
+`src/main/java/org/hello/HelloActivity.java`
+[source,java]
+----
+include::complete/src/main/java/org/hello/HelloActivity.java[]
+----
+
+In this example, we are using Joda Time's `LocalTime` class to retrieve and display the current time. 
+
+If you ran `gradle build` to build the project now, the build would fail because you have not declared Joda Time as a compile dependency in the build. You can fix that by adding the following lines to `build.gradle`:
+
+[source,groovy]
+----
+repositories { mavenCentral() }
+dependencies {
+    compile "joda-time:joda-time:2.3"
+}
+----
+
+The first line here indicates that the build should resolve its dependencies from the Maven Central repository. Gradle leans heavily on many conventions and facilities established by the Maven build tool, including the option of using Maven Central as a source of library dependencies.
+
+Within the `dependencies` block, you declare a single dependency for Joda Time. Specifically, you are asking for (reading right to left) version 2.3 of the joda-time library, in the joda-time group. 
+
+Another thing to note about this dependency is that it is a `compile` dependency, indicating that it should be available during compile-time. Now if you run `gradle build`, Gradle should resolve the Joda Time dependency from the Maven Central repository and the build will be successful.
+
+
+== Build your project with Gradle Wrapper
+
+The Gradle Wrapper is the preferred way of starting a Gradle build. It consists of a batch script for Windows support and a shell script for support on OS X and Linux. These scripts allow you to run a Gradle build without requiring that Gradle be installed on your system. You can install the wrapper into your project by adding the following lines to the build.gradle:
+
+[source,groovy]
+----
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.11'
+}
+----
+
+Run the following command to download and initialize the wrapper scripts:
+
+----
+gradle wrapper
+----
+
+After this task completes, you will notice a few new files. The two scripts are in the root of the folder, while the wrapper jar and properties files have been added to a new `gradle/wrapper` folder.
+
+    └── initial
+        └── gradlew
+        └── gradlew.bat
+        └── gradle
+            └── wrapper
+                └── gradle-wrapper.jar
+                └── gradle-wrapper.properties
+
+The Gradle Wrapper is now available for building your project. It can be used in the exact same way as an installed version of Gradle. Run the wrapper script to perform the build task, just like you did previously:
+
+----
+./gradlew build
+----
+
+The first time you run the wrapper for a specified version of Gradle, it downloads and caches the Gradle binaries for that version. The Gradle Wrapper files are designed to be committed to source control so that anyone can build the project without having to first install and configure a specific version of Gradle.
+
+Here is the completed `build.gradle` file:
+
+`build.gradle`
+[source,gradle]
+----
+include::complete/build.gradle[]
+----
+
+
+
+== Summary
+Congratulations! You have created a simple yet effective Gradle build file for building Android projects.
+
+

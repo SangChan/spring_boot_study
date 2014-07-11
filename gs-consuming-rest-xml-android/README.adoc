@@ -1,0 +1,118 @@
+---
+tags: [rest, android]
+projects: [spring-android]
+---
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-consuming-rest-xml-android
+This guide walks you through the process of building an application that uses Spring for Android's `RestTemplate` to consume XML from a RESTful web service.
+
+== What you'll build
+
+You'll build a simple Android client that fetches some publicly visible Facebook data using their REST API.
+
+
+== What you'll need
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/prereq_editor_android_buildtools.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+
+[[scratch]]
+== Set up the project
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/android_build_system_intro.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_directory_structure_org_hello.adoc[]
+
+
+`pom.xml`
+[source,xml]
+----
+include::initial/pom.xml[]
+----
+    
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_android_manifest.adoc[]
+
+`AndroidManifest.xml`
+[source,xml]
+----
+include::initial/AndroidManifest.xml[]
+----
+
+Add a text string. Text strings can be referenced from the application or from other resource files.
+
+`res/values/strings.xml`
+[source,xml]
+----
+include::initial/res/values/strings.xml[]
+----
+
+Here you define the visual structure for the user interface of your application.
+
+`res/layout/hello_layout.xml`
+[source,xml]
+----
+include::initial/res/layout/hello_layout.xml[]
+----
+
+
+[[initial]]
+== Fetch a REST resource
+
+Before you create a REST request, consider the data that you want your application to consume.
+
+This project includes a simple, self-contained application for use with testing the REST request.
+When you query this service at the /hello-world endpoint, you receive an XML response. This response represents a greeting and resembles the following:
+
+[source,xml]
+----
+<greeting>
+    <id>1</id>
+    <content>"Hello, World!"</content>
+</greeting>
+----
+
+The `id` field is a unique identifier for the greeting, and `content` is the textual representation of the greeting.
+
+
+== Create a representation class
+To model the greeting representation, you create a representation class:
+
+`src/main/java/org/hello/Greeting.java`
+[source,java]
+----
+include::complete/src/main/java/org/hello/Greeting.java[]
+----
+
+
+== Invoke a REST service with the RestTemplate
+
+Spring provides a convenient template class called `RestTemplate`. `RestTemplate` makes interacting with most RESTful services a simple process. In the example below, you establish a few variables and then make a request of the simple REST service. You use the Simple XML library to marshal the XML response data into your representation classes.
+
+`src/main/java/org/hello/HelloActivity.java`
+[source,java]
+----
+include::complete/src/main/java/org/hello/HelloActivity.java[]
+----
+
+Thus far, you've only used the HTTP verb `GET` to make calls, but you could just as easily have used `POST`, `PUT`, and so on.
+
+
+== Start the REST service
+
+In order to consume a REST service, you must first have a REST service to consume. You can start the server, included in this guide, by running the following shell script from the `service` folder:
+
+----
+./start-service.sh
+----
+
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_and_run_android.adoc[]
+
+
+== Summary
+
+Congratulations! You have just developed a simple REST client using Spring.
