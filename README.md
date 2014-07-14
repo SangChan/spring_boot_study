@@ -47,3 +47,17 @@
 8. Creating an Asynchronous, Event-Driven Application with Reactor
 9. Building an Application with Spring Boot : CLI 관련 내용은 실행 안해봄.
 10. Using WebSocket to build an interactive web application
+
+#5일차
+
+1. Working a Getting Started guide with STS : guide 에 있는 소스는 모두 import 가능한 템플릿 형태로 sts 내부에 존재함.
+2. Handling Web Site Preference : cookie, where are you?
+3. Serving Mobile Web Content with Spring MVC : 개발자 메뉴의 사용자 에이전트 변경으로 확인 가능.
+4. Creating a stream of live twitter data using Spring XD : localhost 라서 안됨.
+5. Consuming a RESTful Web Service with AngularJS
+6. Consuming a RESTful Web Service with rest.js
+7. Consuming a RESTful Web Service with Backbone.js
+8. Consuming a RESTful Web Service with jQuery
+9. Consuming a RESTful Web Service with Sencha Touch
+10. Consuming a RESTful Web Service from iOS : see REST folder
+=
