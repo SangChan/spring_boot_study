@@ -1,0 +1,179 @@
+---
+tags: [mobile]
+projects: [spring-mobile]
+---
+:spring_boot_version: 1.1.4.RELEASE
+:Component: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/stereotype/Component.html
+:ComponentScan: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/ComponentScan.html
+:View: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/View.html
+:DeviceHandlerMethodArgumentResolver: http://docs.spring.io/spring-mobile/docs/1.1.x/api/org/springframework/mobile/device/DeviceHandlerMethodArgumentResolver.html
+:Configuration: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/context/annotation/Configuration.html
+:SpringApplication: http://docs.spring.io/spring-boot/docs/{spring_boot_version}/api/org/springframework/boot/SpringApplication.html
+:DeviceResolverHandlerInterceptor: http://docs.spring.io/spring-mobile/docs/1.1.x/api/org/springframework/mobile/device/DeviceResolverHandlerInterceptor.html
+:Device: http://docs.spring.io/spring-mobile/docs/1.1.x/api/org/springframework/mobile/device/Device.html
+:DispatcherServlet: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/DispatcherServlet.html
+:WebMvcConfigurerAdapter: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/config/annotation/WebMvcConfigurerAdapter.html
+:ViewResolver: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/ViewResolver.html
+:ResponseBody: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/bind/annotation/ResponseBody.html
+:ThymeleafViewResolver: http://www.thymeleaf.org/apidocs/thymeleaf-spring3/1.0.1/org/thymeleaf/spring3/view/ThymeleafViewResolver.html
+:LiteDeviceDelegatingViewResolver: http://docs.spring.io/spring-mobile/docs/1.1.x/api/org/springframework/mobile/device/view/LiteDeviceDelegatingViewResolver.html
+:EnableAutoConfiguration: http://docs.spring.io/spring-boot/docs/{spring_boot_version}/api/org/springframework/boot/autoconfigure/EnableAutoConfiguration.html
+:Controller: http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/stereotype/Controller.html
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-serving-mobile-web-content
+
+This guide walks you through the process of using Spring to serve different views to normal, mobile and tablet devices.
+
+== What you'll build
+
+You'll build a service that will accept HTTP GET requests at:
+
+    http://localhost:8080/greeting
+
+and respond with a web page displaying a greeting for a normal desktop browser:
+
+    "Hello standard view!"
+
+Mobile phone browsers will see:
+
+    "Hello mobile view!"
+
+and tablets:
+
+    "Hello tablet view!"
+
+== What you'll need
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/prereq_editor_jdk_buildtools.adoc[]
+
+
+:jump_ahead: Create a configuration class
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+
+[[scratch]]
+== Set up the project
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_system_intro.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_directory_structure_hello.adoc[]
+
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_both_builds.adoc[]
+
+`build.gradle`
+// AsciiDoc source formatting doesn't support groovy, so using java instead
+[source,java]
+----
+include::initial/build.gradle[]
+----
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/bootstrap_starter_pom_disclaimer.adoc[]
+
+By including the Spring Mobile dependency, Spring Boot configures a {DeviceResolverHandlerInterceptor}[`DeviceResolverHandlerInterceptor`] and {DeviceHandlerMethodArgumentResolver}[`DeviceHandlerMethodArgumentResolver`] automatically. {DeviceResolverHandlerInterceptor}[`DeviceResolverHandlerInterceptor`] examines the `User-Agent` header in the incoming request, and based on the header value, determines whether the request is coming from a desktop browser, a mobile browser, or a tablet browser. The {DeviceHandlerMethodArgumentResolver}[`DeviceHandlerMethodArgumentResolver`] allows Spring MVC to use the resolved {Device}[`Device`] object in a controller method.
+
+
+[[initial]]
+== Create a properties file
+
+Use the following property to enable Spring Boot auto-configuration for alternative mobile and tablet views:
+
+`src/main/resources/application.properties`
+[source,java]
+----
+include::complete/src/main/resources/application.properties[]
+----
+
+Internally, {LiteDeviceDelegatingViewResolver}[`LiteDeviceDelegatingViewResolver`] makes use of the {Device}[`Device`] resolved by {DeviceResolverHandlerInterceptor}[`DeviceResolverHandlerInterceptor`] to determine whether to return normal, mobile, or tablet specific views for a request. In this case, {LiteDeviceDelegatingViewResolver}[`LiteDeviceDelegatingViewResolver`] is configured to delegate requests to {ThymeleafViewResolver}[`ThymeleafViewResolver`]. {ThymeleafViewResolver}[`ThymeleafViewResolver`] is a type of {ViewResolver}[`ViewResolver`], which is used by Spring to perform server-side rendering of HTML. Spring Boot defaults to `mobile/` and `tablet/` prefixes for the corresponding views, but alternate locations can be configured with additional properties.
+
+
+== Create a web controller
+
+In Spring's approach to building web sites, HTTP requests are handled by a controller. You can easily identify these requests by the {Controller}[`@Controller`] annotation. In the following example, the GreetingController handles GET requests for /greeting by returning the name of a {View}[`View`], in this case, "greeting". A {View}[`View`] is responsible for rendering the HTML content:
+
+`src/main/java/hello/GreetingController.java`
+[source,java]
+----
+include::complete/src/main/java/hello/GreetingController.java[]
+----
+
+The `@RequestMapping` annotation ensures that HTTP requests to `/greeting` are mapped to the `greeting()` method.
+
+NOTE: The above example does not specify `GET` vs. `PUT`, `POST`, and so forth, because `@RequestMapping` maps all HTTP operations by default. Use `@RequestMapping(method=GET)` to narrow this mapping.
+
+The implementation of the method body relies on a link:/understanding/view-templates[view technology], in this case http://www.thymeleaf.org/doc/html/Thymeleaf-Spring3.html[Thymeleaf], to perform server-side rendering of the HTML. Thymeleaf parses the `greeting.html` template below and renders the HTML.
+
+`src/main/resources/templates/greeting.html`
+[source,html]
+----
+include::complete/src/main/resources/templates/greeting.html[]
+----
+
+Note the location of the mobile and tablet versions of the greeting view. These are the default locations used by auto-configuration. Additional properties are available to specify alternate locations.
+
+    └── src
+        └── main
+            └── resources
+                └── templates
+                    └── greeting.html
+                    └── mobile
+                        └── greeting.html
+                    └── tablet
+                        └── greeting.html
+
+The html body differs slightly for each greeting. The tablet version includes the following:
+
+    <p th:text="'Hello tablet view!'" />
+
+Likewise the mobile version of the greeting view includes the following html:
+
+    <p th:text="'Hello mobile view!'" />
+
+
+== Make the application executable
+
+Although it is possible to package this service as a traditional link:/understanding/WAR[WAR] file for deployment to an external application server, the simpler approach demonstrated in the next section creates a _standalone application_. You package everything in a single, executable JAR file, driven by a good old Java `main()` method. And along the way, you use Spring's support for embedding the link:/understanding/Tomcat[Tomcat] servlet container as the HTTP runtime, instead of deploying to an external instance.
+
+
+`src/main/java/hello/Application.java`
+[source,java]
+----
+include::complete/src/main/java/hello/Application.java[]
+----
+
+The `main()` method defers to the {SpringApplication}[`SpringApplication`] helper class, providing `Application.class` as an argument to its `run()` method. This tells Spring to read the annotation metadata from `Application` and to manage it as a component in the _link:/understanding/application-context[Spring application context]_.
+
+The {ComponentScan}[`@ComponentScan`] annotation tells Spring to search recursively through the `hello` package and its children for classes marked directly or indirectly with Spring's {Component}[`@Component`] annotation. This directive ensures that Spring finds and registers the `SitePreferenceConfiguration` and `SitePreferenceController` classes, because they are marked with {Controller}[`@Controller`], which in turn is a kind of {Component}[`@Component`] annotation.
+
+The {EnableAutoConfiguration}[`@EnableAutoConfiguration`] annotation switches on reasonable default behaviors based on the content of your classpath. For example, because the application depends on the embeddable version of Tomcat (tomcat-embed-core.jar), a Tomcat server is set up and configured with reasonable defaults on your behalf. And because the application also depends on Spring MVC (spring-webmvc.jar), a Spring MVC {DispatcherServlet}[`DispatcherServlet`] is configured and registered for you — no `web.xml` necessary! Auto-configuration is a powerful, flexible mechanism. See the {EnableAutoConfiguration}[API documentation] for further details.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_an_executable_jar_subhead.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_an_executable_jar_with_both.adoc[]
+
+:module: service
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/run_the_application_with_both.adoc[]
+
+Logging output is displayed. The service should be up and running within a few seconds.
+
+
+== Test the service
+
+Now that the web site is running, visit http://localhost:8080/greeting, where you see:
+
+    "Hello standard view!"
+
+Using an iOS simulator or Android emulator you will see:
+
+    "Hello mobile view!"
+
+or
+
+    "Hello tablet view!" 
+
+
+== Summary
+
+Congratulations! You have just developed a simple web page that detects the type of device being used by a client and serves different views for each device type.

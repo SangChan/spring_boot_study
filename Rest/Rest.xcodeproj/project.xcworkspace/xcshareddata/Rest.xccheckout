@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>E02B6337-DBA1-4256-B965-DDCEF24EAB2D</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Rest</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>1ABB5A18-6FAE-4C27-89A3-92B2F476F226</key>
+		<string>https://github.com/SangChan/spring_study.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Rest/Rest.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>1ABB5A18-6FAE-4C27-89A3-92B2F476F226</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/SangChan/spring_study.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>1ABB5A18-6FAE-4C27-89A3-92B2F476F226</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>1ABB5A18-6FAE-4C27-89A3-92B2F476F226</string>
+			<key>IDESourceControlWCCName</key>
+			<string>spring_io</string>
+		</dict>
+	</array>
+</dict>
+</plist>
