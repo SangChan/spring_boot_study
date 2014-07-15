@@ -67,10 +67,10 @@
 5. Building Spring YARN Projects with Maven
 6. Simple YARN Application
 7. Testing YARN Application
-8. Batch YARN Application
-9. Restartable Batch YARN Application
+8. Batch YARN Application : 그냥 읽어만 보고 넘어감
+9. Restartable Batch YARN Application : 그냥 읽어만 보고 넘어감.
 10. Accessing Data with GORM
-11. Consuming a SOAP web service
+11. Consuming a SOAP web service : 에러남.
 
 #7일차
 

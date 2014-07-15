@@ -1,0 +1,193 @@
+---
+tags: [spring-boot, gorm, groovy]
+projects: [spring-boot, grails]
+---
+:spring_version: current
+:spring_boot_version: 1.1.4.RELEASE
+:Component: http://docs.spring.io/spring/docs/{spring_version}/javadoc-api/org/springframework/stereotype/Component.html
+:Controller: http://docs.spring.io/spring/docs/{spring_version}/javadoc-api/org/springframework/stereotype/Controller.html
+:DispatcherServlet: http://docs.spring.io/spring/docs/{spring_version}/javadoc-api/org/springframework/web/servlet/DispatcherServlet.html
+:SpringApplication: http://docs.spring.io/spring-boot/docs/{spring_boot_version}/api/org/springframework/boot/SpringApplication.html
+:ResponseBody: http://docs.spring.io/spring/docs/{spring_version}/javadoc-api/org/springframework/web/bind/annotation/ResponseBody.html
+:EnableAutoConfiguration: http://docs.spring.io/spring-boot/docs/{spring_boot_version}/api/org/springframework/boot/autoconfigure/EnableAutoConfiguration.html
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-accessing-data-gorm
+
+This guide walks you through the process of creating a Spring Boot application that uses Grails Object Relational Mapper (http://grails.org/doc/latest/guide/GORM.html[GORM]) and Hibernate for persistence.
+
+== What you'll build
+
+You'll build a Spring application that persists data to an in-memory database using GORM. 
+
+NOTE: This guide only uses uses the Grails GORM library. You aren't required to use the full Grails web stack.
+
+
+== What you'll need
+
+:linkattrs:
+
+ifndef::java_version[:java_version: 1.7]
+
+ - About 15 minutes
+ - A favorite text editor or IDE
+ - http://www.oracle.com/technetwork/java/javase/downloads/index.html[JDK {java_version}] or later
+ - http://www.gradle.org/downloads[Gradle 1.8+] 
+ - You can also import the code from this guide as well as view the web page directly into link:/guides/gs/sts[Spring Tool Suite (STS)] and work your way through it from there.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+
+[[scratch]]
+== Set up the project
+
+:linkattrs:
+
+First you set up a basic build script. You can use any build system you like when building apps with Spring, but the code you need to work with http://gradle.org[Gradle] is included here. Refer to link:/guides/gs/gradle[Building Java Projects with Gradle] if you have never worked with Gradle before.
+
+=== Create the directory structure
+
+In a project directory of your choosing, create the following subdirectory structure; for example, with `mkdir -p src/main/groovy/hello` on *nix systems:
+
+    └── src
+        └── main
+            └── groovy
+                └── hello
+
+=== Create a Gradle build file
+Below is the https://github.com/spring-guides/{project_id}/blob/master/initial/build.gradle[initial Gradle build file]. If you are using link:/guides/gs/sts[Spring Tool Suite (STS)], you can import the guide directly.
+
+`build.gradle`
+// AsciiDoc source formatting doesn't support groovy, so using java instead
+[source,java]
+----
+include::initial/build.gradle[]
+----
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/spring-boot-gradle-plugin.adoc[]
+
+
+[[initial]]
+== Create a GORM entity
+
+In this example, we model a simple Person entity using GORM:
+
+`src/main/groovy/hello/Person.groovy`
+[source,groovy]
+----
+include::complete/src/main/groovy/hello/Person.groovy[]
+----
+
+The http://grails.org/doc/latest/guide/GORM.html#gormConstraints[constraint block] defines any validation rules. In this case, the only constraint is that both fields must be provided.
+
+== Create a resource controller
+
+Create a controller for your Groovy-based Spring application:
+
+`src/main/groovy/hello/GreetingController.groovy`
+[source,groovy]
+----
+include::complete/src/main/groovy/hello/GreetingController.groovy[]
+----
+
+The above example defines two REST endpoints:
+
+- The `addPerson` endpoint allows the addition of new people
+- The `greet` endpoint greets a person by their first name.
+
+Further down in the guide, you'll see how to run the application and create new `Person` entries.
+
+== Make the application executable
+
+Although it is possible to package this service as a traditional link:/understanding/WAR[WAR] file for deployment to an external application server, the simpler approach demonstrated below creates a standalone application. You package everything in a single, executable JAR file, driven by a good old Java `main()` method. Along the way, you use Spring's support for embedding the link:/understanding/Tomcat[Tomcat] servlet container as the HTTP runtime, instead of deploying to an external instance.
+
+
+`src/main/groovy/hello/Application.groovy`
+[source,groovy]
+----
+include::complete/src/main/groovy/hello/Application.groovy[]
+----
+
+The `main()` method defers to the {SpringApplication}[`SpringApplication`] helper class, providing `Application.class` as an argument to its `run()` method. This tells Spring to read the annotation metadata from `Application` and to manage it as a component in the link:/understanding/application-context[Spring application context].
+
+The `@ComponentScan` annotation tells Spring to search recursively through the `hello` package and its children for classes marked directly or indirectly with Spring's {Component}[`@Component`] annotation. This directive ensures that Spring finds and registers the `GreetingController`, because it is marked with `@Controller`, which in turn is a kind of `@Component` annotation.
+
+The {EnableAutoConfiguration}[`@EnableAutoConfiguration`] annotation switches on reasonable default behaviors based on the content of your classpath. For example, because the application depends on the embeddable version of Tomcat (tomcat-embed-core.jar), a Tomcat server is set up and configured with reasonable defaults on your behalf. And because the application also depends on Spring MVC (spring-webmvc.jar), a Spring MVC {DispatcherServlet}[`DispatcherServlet`] is configured and registered for you — no `web.xml` necessary! Auto-configuration is a powerful, flexible mechanism. See the {EnableAutoConfiguration}[API documentation] for further details.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_an_executable_jar_subhead.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_an_executable_jar_with_both.adoc[]
+
+[[testing]]
+== Test the application
+
+With the application started, you can create a new person by submitting a `POST` request. For example using the *nix `curl` tool:
+
+[source,plain]
+----
+$ curl -i -X POST -d "firstName=Homer&lastName=Simpson" http://localhost:8080/person/add
+----
+
+This results in the following response indicating that a resource was created:
+
+[source]
+----
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+Content-Length: 0
+Date: Wed, 19 Feb 2014 13:21:06 GMT
+----
+
+You can then submit a `GET` request to the `greet` endpoint to receive a greeting:
+
+[source,plain]
+----
+$ curl -i http://localhost:8080/person/greet?firstName=Homer
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Content-Type: text/plain;charset=ISO-8859-1
+Content-Length: 12
+Date: Wed, 19 Feb 2014 13:22:15 GMT
+
+Hello Homer!
+----
+
+NOTE: This RESTful front end was coded for demonstration purposes. You can plug in GORM wherever you need it for your application.
+
+== Groovy Script Support
+
+The previous example required you to setup a Gradle or Maven build, but you can also use GORM in a simple Groovy script. 
+
+As an example, create a new file called *app.groovy* and put the following code in it:
+
+`app.groovy`
+[source,groovy]
+----
+include::script/app.groovy[]
+----
+
+NOTE: It doesn't matter where the file is.
+
+Next, https://github.com/spring-projects/spring-boot#installing-the-cli[install Spring Boot's CLI].
+
+Run it as follows:
+
+----
+$ spring run app.groovy
+----
+
+NOTE: This assumes you shut down the previous application, to avoid a port collision.
+
+Then simply follow the previous steps to <<testing,test the application>>.
+
+== Configuring the DataSource
+
+The `javax.sql.DataSource` to be used to create connections can be configured as per the http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-configure-datasource[instructions in the Spring Boot user guide].
+
+== Summary
+
+Congratulations! You've just developed a Spring application using GORM for data access as well as a RESTful front end!
+
+
+

@@ -1,0 +1,2 @@
+rootProject.name = 'gs-yarn-testing'
+include 'gs-yarn-testing-client','gs-yarn-testing-appmaster','gs-yarn-testing-container','gs-yarn-testing-dist'

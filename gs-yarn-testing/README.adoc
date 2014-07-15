@@ -1,0 +1,124 @@
+---
+tags: [hadoop,yarn,boot]
+projects: [spring-hadoop]
+---
+:spring_version: 4.0.5.RELEASE
+:spring_boot_version: 1.1.0.RELEASE
+:spring_hadoop_version: 2.0.0.RELEASE
+:jdk: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-yarn-testing
+:yarn_base_appmaster: gs-yarn-testing-appmaster
+:yarn_base_container: gs-yarn-testing-container
+:yarn_base_client: gs-yarn-testing-client
+:yarn_base_dist: gs-yarn-testing-dist
+This guide walks you through testing a simple Spring YARN project.
+
+== What you'll build
+
+You'll use an existing sample application and create a simple JUnit test to verify application is executed properly.
+
+
+== What you'll need
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/prereq_editor_jdk_buildtools.adoc[]
+ - Local single-node instance based on Hadoop 2.2.0 or later
+
+NOTE: Testing this sample application don't need existing or running Hadoop instance.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+If you're not familiar with gradle, refer to link:/guides/gs/gradle[Building Java Projects with Gradle].
+
+[[scratch]]
+== Set up the project
+
+Focus on this guide is to use `JUnit` to test your sample application. We have already prepared a project for gradle and application files based on sample link:/guides/gs/yarn-basic[YARN Basic Sample]. What is left for you is to create a `JUnit` test class.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_system_intro.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/build_system_intro_yarn.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_directory_structure_yarn_test_hello.adoc[]
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_both_builds.adoc[]
+
+[[initial]]
+== Create a JUnit Test Class
+
+`gs-yarn-testing-dist/src/test/java/hello/AppIT.java`
+[source,java]
+----
+include::complete/gs-yarn-testing-dist/src/test/java/hello/AppIT.java[]
+----
+
+Let's go through step by step what's happening in this `JUnit` class. As already mentioned earlier we don't need any existing or running Hadoop instances, instead testing framework from Spring YARN provides an easy way to fire up a mini cluster where your tests can be run in an isolated environment. 
+
+We named a class as `AppIT` which plays nice with both gradle and
+maven when tests are executed during the build. Tests will need a real
+artifacts to be build which means test can only run after jar files
+has been build and processed by a `Spring Boot's` repackage plugin.
+In gradle build file we make sure artifacts are build before tests are
+run. In maven build file we use `failsafe` plugin which is meant for
+integration testing and tests handled by it are executed after all
+project artifacts has been build.
+
+ - We used `spring.yarn.client.files` property to override settings
+   defined in `application.yml` file because test is run from
+   `gs-yarn-testing-dist` project.
+ - `@MiniYarnClusterTest` is a composed annotation telling Spring to start a Hadoop's mini cluster having components for `HDFS` and `YARN`. Hadoop's configuration from this minicluster is automatically injected into your testing context.
+ - `AbstractBootYarnClusterTests` is a class containing a lot of base functionality what you need in your tests.
+
+Then it's time to deploy the application into a running minicluster
+
+ - `submitApplicationAndWait()` method simply runs your
+   `ClientApplication` and expects it to do an application deployment. On default it will wait 60 seconds an application to finish and returns a current state.
+ - We make sure that we have a correct application state
+
+We use `ContainerLogUtils` to find our container logs files from a minicluster.
+
+ - We assert count of a log files
+ - We expect some specified content from log file
+ - We expect `stderr` files to be empty
+
+== Run Test
+
+If using gradle:
+[source,text]
+----
+./gradlew clean build
+----
+
+If using maven:
+[source,text]
+----
+mvn clean package
+----
+
+If test is executed succesfully you'd be able to see YARN container
+logs within the minicluster logging directory:
+
+[source,text]
+----
+$ find gs-yarn-testing-dist/target/|grep std
+target/yarn--1502101888/yarn--1502101888-logDir-nm-0_0/application_1392395851515_0001/container_1392395851515_0001_01_000002/Container.stdout
+target/yarn--1502101888/yarn--1502101888-logDir-nm-0_0/application_1392395851515_0001/container_1392395851515_0001_01_000002/Container.stderr
+target/yarn--1502101888/yarn--1502101888-logDir-nm-0_0/application_1392395851515_0001/container_1392395851515_0001_01_000001/Appmaster.stdout
+target/yarn--1502101888/yarn--1502101888-logDir-nm-0_0/application_1392395851515_0001/container_1392395851515_0001_01_000001/Appmaster.stderr
+----
+
+[source,text]
+----
+$ grep Hello gs-yarn-testing-dist/target/yarn--1502101888/yarn--1502101888-logDir-nm-0_0/application_1392395851515_0001/container_1392395851515_0001_01_000002/Container.stdout
+[2014-02-14 16:37:54.278] boot - 18453  INFO [main] --- HelloPojo: Hello from HelloPojo
+[2014-02-14 16:37:54.278] boot - 18453  INFO [main] --- HelloPojo: About to list from hdfs root content
+[2014-02-14 16:37:55.157] boot - 18453  INFO [main] --- HelloPojo: FileStatus{path=hdfs://localhost:33626/; isDirectory=true; modification_time=1392395854968; access_time=0; owner=jvalkealahti; group=supergroup; permission=rwxr-xr-x; isSymlink=false}
+[2014-02-14 16:37:55.157] boot - 18453  INFO [main] --- HelloPojo: FileStatus{path=hdfs://localhost:33626/app; isDirectory=true; modification_time=1392395854968; access_time=0; owner=jvalkealahti; group=supergroup; permission=rwxr-xr-x; isSymlink=false}
+----
+
+== Summary
+
+Congratulations! You have now created a simple yet effective `JUnit`
+test for building Spring YARN projects.

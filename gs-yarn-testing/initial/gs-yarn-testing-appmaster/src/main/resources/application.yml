@@ -1,0 +1,17 @@
+spring:
+    hadoop:
+        fsUri: hdfs://localhost:8020
+        resourceManagerHost: localhost
+    yarn:
+        appName: gs-yarn-testing
+        applicationDir: /app/gs-yarn-testing/
+        client:
+            files:
+              - "file:gs-yarn-testing-dist/target/gs-yarn-testing-dist/gs-yarn-testing-container-0.1.0.jar"
+              - "file:gs-yarn-testing-dist/target/gs-yarn-testing-dist/gs-yarn-testing-appmaster-0.1.0.jar"
+            launchcontext:
+                archiveFile: gs-yarn-testing-appmaster-0.1.0.jar
+        appmaster:
+            containerCount: 1
+            launchcontext:
+                archiveFile: gs-yarn-testing-container-0.1.0.jar
