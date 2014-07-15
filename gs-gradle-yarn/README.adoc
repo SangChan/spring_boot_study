@@ -1,0 +1,196 @@
+---
+tags: [gradle,hadoop,yarn]
+projects: [spring-hadoop]
+---
+:spring_boot_version: 1.1.0.RELEASE
+:jdk: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-gradle-yarn
+:yarn_base_appmaster: gs-gradle-yarn-appmaster
+:yarn_base_container: gs-gradle-yarn-container
+:yarn_base_client: gs-gradle-yarn-client
+:yarn_base_dist: gs-gradle-yarn-dist
+This guide walks you through using Gradle to build a simple Spring YARN project.
+
+== What you'll build
+
+You'll create a simple app and then build it using Gradle.
+
+NOTE: In this guide we are not trying to create fully working YARN application, instead we focus on project and build model.
+
+== What you'll need
+
+ - About 15 minutes
+ - A favorite text editor or IDE
+ - {jdk}[JDK 6] or later
+
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+If you're not familiar with gradle or don't have it installed, refer to link:/guides/gs/gradle[Building Java Projects with Gradle].
+
+[[scratch]]
+== Set up the project
+
+First you set up a Java project for Gradle to build. To keep the focus on Gradle, make the project as simple as possible for now.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_directory_structure_yarn_hello.adoc[]
+
+First, let's create a `ContainerApplication` class.
+
+`gs-gradle-yarn-container/src/main/java/hello/container/ContainerApplication.java`
+[source,java]
+----
+include::complete/gs-gradle-yarn-container/src/main/java/hello/container/ContainerApplication.java[]
+----
+
+Next, we create an `AppmasterApplication` class.
+
+`gs-gradle-yarn-appmaster/src/main/java/hello/appmaster/AppmasterApplication.java`
+[source,java]
+----
+include::complete/gs-gradle-yarn-appmaster/src/main/java/hello/appmaster/AppmasterApplication.java[]
+----
+
+The last Java class we need to create is a `ClientApplication` class.
+
+`gs-gradle-yarn-client/src/main/java/hello/client/ClientApplication.java`
+[source,java]
+----
+include::complete/gs-gradle-yarn-client/src/main/java/hello/client/ClientApplication.java[]
+----
+
+Now we need to create an `application` YAML configuration file for all
+sub-projects.
+
+`gs-gradle-yarn-container/src/main/resources/application.yml`
+`gs-gradle-yarn-appmaster/src/main/resources/application.yml`
+`gs-gradle-yarn-client/src/main/resources/application.yml`
+[source,yaml]
+----
+include::complete/gs-gradle-yarn-container/src/main/resources/application.yml[]
+----
+
+[[initial]]
+== Understanding Gradle Usage with Spring YARN
+
+We need to create a `build.gradle` file where we define everything needed for the build.
+
+We will be using the Spring Boot Gradle plugin so `repository` and `dependency` needs to be defined within a `buildscript` section.
+
+[source,groovy]
+----
+include::complete/build.gradle[tags=snippetA]
+----
+
+We apply gradle `base` plugin to all projects. Technically it's only
+needed for a root project order to have i.e. `clean` task in it. But
+it doesn't matter if we add it to all projects.
+
+[source,groovy]
+----
+include::complete/build.gradle[tags=snippetB]
+----
+
+Below that section we add the following -- project version as `0.1.0`,
+apply plugins for `java`, `eclipse`, `idea` and add `repositories` to
+resolve all of the third party jar dependencies via Maven
+repositories.
+Next we add `spring-boot` plugin, `spring-yarn-boot` maven
+dependency to all sub-projects. Additionally we create a `copyJars`
+task to copy created jars from a sub-projects into a distribute project
+named `gs-yarn-testing-dist`. This will make things easier to
+test and run your application.
+
+[source,groovy]
+----
+include::complete/build.gradle[tags=snippetC]
+----
+
+We add configure section for each sub-project. These are empty for now
+but needed in further guides when more specific dependencies are
+added.
+The Gradle plugin for `Spring Boot` automatically creates a task to
+repackage a main jar file created from a project.
+
+[source,groovy]
+----
+include::complete/build.gradle[tags=snippetD]
+----
+
+Next, related to what we previously did, in project
+`gs-gradle-yarn-dist` we add a compile dependency
+for all sub-projects. This is required later guides when we create
+tests to this project.
+
+[source,groovy]
+----
+include::complete/build.gradle[tags=snippetE]
+----
+
+It is worth to go through what we did in above section for
+`gs-gradle-yarn-dist`:
+
+- Eventually we want to use this project to collect other artifacts
+  together and create some tests. That is why we added dependencies to
+  other projects.
+- We used `test.dependsOn` for all other projects `assembly` task to
+  make sure that Spring Boot's gradle plugin does a repackage before
+  any tests are run. 
+- We ask `clean` task to wipe up our `target` directory. This sounds
+  very `maven` centric but in our samples we try to support same
+  project structure for both `maven` and `gradle`. Also due to
+  limitations in Hadoop's testing classes, some files are hard coded
+  to be created under `target` directory.
+- We disabled `jar` task for this project to reduce noise. Disabling
+  this really doesn't matter but if there is only tests classes in
+  this project this jar would be empty and thus unnecessary.
+
+Last we just add a normal gradle wrapper task which is not needed for
+project itself but allows to use this build file without installing
+gradle binaries.
+
+[source,groovy]
+----
+include::complete/build.gradle[tags=snippetF]
+----
+
+We need to create a `settings.gradle` file where we define a name of a
+root project and include sub-projects.
+
+[source,text]
+----
+include::complete/settings.gradle[]
+----
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/describe_shdp_yarn_deps_gradle.adoc[]
+
+== Build Application Packages
+
+Run build.
+
+[source,text]
+----
+gradle clean build
+----
+
+You should see three jar files created.
+
+[source,text]
+----
+gs-gradle-yarn-dist/target/gs-gradle-yarn-dist/gs-gradle-yarn-client-0.1.0.jar
+gs-gradle-yarn-dist/target/gs-gradle-yarn-dist/gs-gradle-yarn-container-0.1.0.jar
+gs-gradle-yarn-dist/target/gs-gradle-yarn-dist/gs-gradle-yarn-appmaster-0.1.0.jar
+----
+
+You can run the project with `java -jar gs-gradle-yarn-dist/target/dist/gs-gradle-yarn-client-0.1.0.jar` 
+but we haven't added the code to 
+actually submit the YARN application yet. So, all you will see is some logging mesages. 
+You will build a complete application that you can submit to YARN in the other 
+Getting Started Guides for Spring YARN.
+
+== Summary
+
+Congratulations! You have now created a simple yet effective Gradle build file for building Spring YARN projects.

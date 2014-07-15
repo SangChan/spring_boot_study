@@ -1,0 +1,171 @@
+---
+tags: [maven,hadoop,yarn]
+projects: [spring-hadoop]
+---
+:spring_boot_version: 1.1.0.RELEASE
+:jdk: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-maven-yarn
+:yarn_base_appmaster: gs-maven-yarn-appmaster
+:yarn_base_container: gs-maven-yarn-container
+:yarn_base_client: gs-maven-yarn-client
+:yarn_base_dist: gs-maven-yarn-dist
+This guide walks you through using Maven to build a simple Spring YARN project.
+
+== What you'll build
+
+You'll create a simple app and then build it using Maven.
+
+NOTE: In this guide we are not trying to create fully working YARN application, instead we focus on project and build model.
+
+== What you'll need
+
+ - About 15 minutes
+ - A favorite text editor or IDE
+ - {jdk}[JDK 6] or later
+
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+If you're not familiar with gradle, refer to
+link:/guides/gs/maven[Building Java Projects with Maven].
+
+[[scratch]]
+== Set up the project
+
+First you set up a Java project for Maven to build. To keep the focus on Maven, make the project as simple as possible for now.
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/create_directory_structure_yarn_hello.adoc[]
+
+Here you create a `ContainerApplication` class.
+
+`gs-maven-yarn-container/src/main/java/hello/container/ContainerApplication.java`
+[source,java]
+----
+include::complete/gs-maven-yarn-container/src/main/java/hello/container/ContainerApplication.java[]
+----
+
+Here you create an `AppmasterApplication` class.
+
+`gs-maven-yarn-appmaster/src/main/java/hello/appmaster/AppmasterApplication.java`
+[source,java]
+----
+include::complete/gs-maven-yarn-appmaster/src/main/java/hello/appmaster/AppmasterApplication.java[]
+----
+
+Here you create a `ClientApplication` class.
+
+`gs-maven-yarn-client/src/main/java/hello/client/ClientApplication.java`
+[source,java]
+----
+include::complete/gs-maven-yarn-client/src/main/java/hello/client/ClientApplication.java[]
+----
+
+Here you create a `application` yaml configuration file for all
+sub-projects.
+
+`gs-maven-yarn-container/src/main/resources/application.yml`
+[source,yaml]
+----
+include::complete/gs-maven-yarn-container/src/main/resources/application.yml[]
+----
+
+`gs-maven-yarn-appmaster/src/main/resources/application.yml`
+[source,yaml]
+----
+include::complete/gs-maven-yarn-appmaster/src/main/resources/application.yml[]
+----
+
+`gs-maven-yarn-client/src/main/resources/application.yml`
+[source,yaml]
+----
+include::complete/gs-maven-yarn-client/src/main/resources/application.yml[]
+----
+
+[[initial]]
+== Understanding Maven Usage with Spring YARN
+
+Here you create a main parent `pom.xml` file.
+
+`pom.xml`
+[source,xml]
+----
+include::complete/pom.xml[]
+----
+
+We created a project structure placing `appmaster`, `container` and
+`client` in its own sub-projects. Additionally we added a fourth
+project named `dist` which only purpose is to use `assembly` plugin
+to collect all artifacts together when project is build.
+
+Here you create an appmaster `pom.xml` file.
+
+`gs-maven-yarn-appmaster/pom.xml`
+[source,xml]
+----
+include::complete/gs-maven-yarn-appmaster/pom.xml[]
+----
+
+Here you create a container `pom.xml` file.
+
+`gs-maven-yarn-container/pom.xml`
+[source,xml]
+----
+include::complete/gs-maven-yarn-container/pom.xml[]
+----
+
+Here you create a client `pom.xml` file.
+
+`gs-maven-yarn-client/pom.xml`
+[source,xml]
+----
+include::complete/gs-maven-yarn-client/pom.xml[]
+----
+
+Here you create a distribution `pom.xml` file.
+
+`gs-maven-yarn-dist/pom.xml`
+[source,xml]
+----
+include::complete/gs-maven-yarn-dist/pom.xml[]
+----
+
+Here you create an assembly `assembly.xml` file.
+
+`gs-maven-yarn-dist/assembly.xml`
+[source,xml]
+----
+include::complete/gs-maven-yarn-dist/assembly.xml[]
+----
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/describe_shdp_yarn_deps_maven.adoc[]
+
+== Build Application Packages
+
+Run build.
+
+[source,text]
+----
+mvn clean package
+----
+
+You should see three jar files created.
+
+[source,text]
+----
+gs-maven-yarn-dist/target/gs-maven-yarn-dist/gs-maven-yarn-client-0.1.0.jar
+gs-maven-yarn-dist/target/gs-maven-yarn-dist/gs-maven-yarn-container-0.1.0.jar
+gs-maven-yarn-dist/target/gs-maven-yarn-dist/gs-maven-yarn-appmaster-0.1.0.jar
+----
+
+You can run the project with `java -jar
+gs-maven-yarn-dist/target/dist/gs-maven-yarn-client-0.1.0.jar` but we haven't added the
+code to actually submit the YARN application yet. So, all you will see is some
+logging mesages. You will build a complete application that you can submit to
+YARN in the other Getting Started Guides for Spring YARN.
+
+== Summary
+
+Congratulations! You have now created a simple yet effective Maven build file for building Spring YARN projects.

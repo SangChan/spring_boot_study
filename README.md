@@ -23,7 +23,6 @@
 10. Building Android Projects with Gradle : 그냥 읽기만 하고 넘어감
 
 #3일차
-
 1. Building a RESTful Web Service with Spring Boot Actuator
 2. Messaging with JMS
 3. Consuming XML from a RESTful Web Service with Spring for Android : 읽기만 하고 넘어감
@@ -36,7 +35,6 @@
 10. Caching Data with GemFire
 
 #4일차
-
 1. Managing Transactions
 2. Accessing Data with JPA
 3. Accessing Data with MongoDB : dbpath 로 ~/workspace/db 넘김
@@ -49,7 +47,6 @@
 10. Using WebSocket to build an interactive web application
 
 #5일차
-
 1. Working a Getting Started guide with STS : guide 에 있는 소스는 모두 import 가능한 템플릿 형태로 sts 내부에 존재함.
 2. Handling Web Site Preference : cookie, where are you?
 3. Serving Mobile Web Content with Spring MVC : 개발자 메뉴의 사용자 에이전트 변경으로 확인 가능.
@@ -60,5 +57,9 @@
 8. Consuming a RESTful Web Service with jQuery
 9. Consuming a RESTful Web Service with Sencha Touch
 10. Consuming a RESTful Web Service from iOS : see REST folder
+
+#6일차
+
+#7일차
 
 

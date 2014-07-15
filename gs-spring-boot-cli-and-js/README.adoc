@@ -1,0 +1,116 @@
+---
+tags: [JavaScript, spring-boot, groovy, cli, jquery, webjars]
+projects: [spring-boot]
+---
+:toc:
+:icons: font
+:source-highlighter: prettify
+:project_id: gs-spring-boot-cli-and-js
+
+This guide shows how to use Spring Boot's Command Line Interface to create a rich application with a
+backend support by Spring MVC and a web-based front end using Thymeleaf template engine and jQuery.
+
+== What you'll build
+
+You'll build a web application using Groovy and Spring while also using Thymeleaf and jQuery.
+
+== What you'll need
+
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/prereq_editor_jdk_buildtools.adoc[]
+
+
+:initial: /
+:complete: /
+include::https://raw.githubusercontent.com/spring-guides/getting-started-macros/master/how_to_complete_this_guide.adoc[]
+
+[[scratch]]
+== Install Spring Boot's CLI
+Spring Boot comes with a Command Line Interface. There are several ways to install it.
+
+You can install it via gvm:
+
+----
+curl -s get.gvmtool.net | bash
+----
+
+With gvm installed, you then install the CLI:
+
+----
+gvm install springboot
+spring --version
+----
+
+If you are using a Mac, you can also the CLI using Homebrew.
+
+----
+brew tap pivotal/tap
+brew install springboot
+spring --version
+----
+
+With either of these options, you are now in business to create a Spring application with minimal effort.
+
+[[initial]]
+== Creating a Spring application
+Now create the simplest application possible.
+
+`app.groovy`
+[source,groovy]
+----
+include::app.groovy[lines=2..999]
+----
+
+This Spring MVC controller defines a REST endpoint at `/greeting`. We'll write the template for that later in this guide.
+
+== Adding a Javascript library
+
+Let's demonstrate this using a jQuery animation. We first need to grab a copy of jQuery. The simplest option would to add a Groovy @Grab annotation to the top of your application that automatically fetches it.
+
+[source,groovy]
+----
+include::app.groovy[lines=1]
+----
+
+NOTE: Feel free to read more about http://spring.io/blog/2014/01/03/utilizing-webjars-in-spring-boot[Spring Boot + webjars].
+
+== Writing a web front end
+
+Let's create a Thymeleaf template to support our Spring MVC endpoint.
+
+----
+mkdir templates
+----
+
+Now add the following template:
+
+`templates/greeting.html`
+[source,html]
+----
+include::templates/greeting.html[]
+----
+
+NOTE: Because we used webjars, jQuery is found at `webjars/jquery/<version>/<library>`.
+
+== Running the application
+
+Now launch the application.
+
+----
+spring run -cp . app.groovy
+----
+
+See the animation by visiting http://localhost:8080/greeting.
+
+This almost empty application comes preloaded with a lot of features thanks to Spring Boot.
+
+- @Controller gives a signal that this is a Spring MVC application and Boot will launch an embedded
+Tomcat servlet container.
+- Several paths are autoloaded for serving assets(see https://spring.io/blog/2014/01/03/utilizing-webjars-in-spring-boot[webjars] and https://spring.io/blog/2013/12/19/serving-static-web-content-with-spring-boot[static web content] blog entries for more details). That's why we placed our web template in the `/templates` folder.
+
+From here you can add RESTful endpoints to the backend, work on your front end, and grow your application as needed.
+
+== Summary
+Spring Boot CLI provides a rapid way to create a back end server app. It also supports plugging in your 
+favorite Javascript resources and HTML templates. You also could have staged CSS assets. Bottom line: you don't have to create a project file. Instead, you can dive quickly into building your application.
+
+

@@ -1,0 +1,22 @@
+{
+  "name": "draft-messaging-stomp-msgsjs",
+  "version": "0.0.1",
+  "authors": [
+    "Brian Cavalier <bcavalier@gopivotal.com>"
+  ],
+  "license": "http://www.apache.org/licenses/LICENSE-2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "public/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "msgs": "dev",
+    "curl": "~0.8",
+    "sockjs": "~0.3",
+    "stomp-websocket": "~2.0"
+  }
+}
+
