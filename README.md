@@ -60,6 +60,18 @@
 
 #6일차
 
+1. Enabling Cross Origin Requests for a RESTful Web Service
+2. Using WebSocket and msgs.js to build an interactive web application
+3. Application development with Spring Boot + JS
+4. Building Spring YARN Projects with Gradle
+5. Building Spring YARN Projects with Maven
+6. Simple YARN Application
+7. Testing YARN Application
+8. Batch YARN Application
+9. Restartable Batch YARN Application
+10. Accessing Data with GORM
+11. Consuming a SOAP web service
+
 #7일차
 
 
