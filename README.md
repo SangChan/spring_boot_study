@@ -74,4 +74,8 @@
 
 #7일차
 
-
+1. Accessing JPA Data with REST
+2. Accessing Neo4j Data with REST
+3. Accessing MongoDB Data with REST : /data/db 퍼미션 문제 해결
+4. Accessing GemFire Data with REST
+5. Accessing MongoDB Data with GORM
