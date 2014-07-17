@@ -1,0 +1,6 @@
+spring:
+    mongodb:
+        host: "localhost"
+        databaseName: "citydb"
+        options:
+            connectionsPerHost: 20
